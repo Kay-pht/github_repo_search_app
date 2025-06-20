@@ -1,0 +1,87 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+<!-- ARCHITECTURE.md -->
+# GitHub Repository Search App – Architecture & Overview
+
+## 1. Purpose
+GitHub の **search/repositories** API を用いて  
+- **キーワード検索 → 結果一覧（無限スクロール） → 詳細ページ**  
+を最小構成で実装する学習用 Web アプリ。Next.js（App Router）採用。
+
+## 2. MVP Scope (YAGNI)
+| 画面 | 要件 |
+|------|------|
+| **トップページ** (`/`) | 検索フォーム／結果カード／**無限スクロール** |
+| **詳細ページ** (`/repo/[owner]/[name]`) | リポジトリ名・オーナー・言語・Star／Watcher／Fork／Issue 数 |
+| **API** | PAT 認証・検索／詳細取得 |
+| **テスト** | TDD、クリティカル部分のみ |
+| **CI** | GitHub Actions（Node.js *最新 LTS* + **npm**） |
+| **UI** | Tailwind CSS + shadcn/ui |
+
+## 3. Tech Stack
+| Layer | Library / Policy |
+|-------|------------------|
+| Runtime | **Node.js – 最新 LTS**<br>インストール: `nvm install --lts` |
+| Framework | **Next.js – 最新安定版** (`create-next-app@latest`) |
+| Language | **TypeScript – 最新安定版** (`npm i -D typescript@latest`) |
+| Styling | **Tailwind CSS – 最新安定版** (`npx tailwindcss init -p`) |
+| Data & State | **TanStack Query – 最新安定版** |
+| Test | **Jest / Playwright – 最新安定版** |
+| CI | GitHub Actions + npm cache (`actions/setup-node` with `node-version: lts/*`) |
+
+> **NOTE**  
+> すべてのライブラリは *インストール時点での最新 LTS / 安定版* を取得するコマンドを採用し、特定バージョンは固定しない。
+
+## 4. Directory Structure (proposal)
+src/
+├─ app/
+│ ├─ page.tsx
+│ ├─ repo/[owner]/[name]/page.tsx
+│ └─ api/github/
+├─ components/
+│ ├─ SearchBar.tsx
+│ ├─ RepoCard.tsx
+│ ├─ RepoList.tsx
+│ └─ InfiniteScroll.tsx
+├─ lib/
+│ ├─ github.ts
+│ └─ types.ts
+├─ tests/
+└─ e2e/
+
+
+## 5. Routing & Data Flow
+1. `/` でキーワード入力 → URL クエリ保持  
+2. *useInfiniteQuery* で `/api/github/search` をページング取得  
+3. IntersectionObserver が自動追加ロード  
+4. カードクリック → `/repo/[owner]/[name]`  
+5. Server Component が `/api/github/repo` を取得し描画
+
+## 6. Error / Loading UX
+- Tailwind Skeleton (`animate-pulse`)  
+- 429/403 エラー → Toast  
+- 0 件 → Empty State
+
+## 7. GitHub API
+| Endpoint | 用途 |
+|----------|------|
+| `GET /search/repositories` | 検索 |
+| `GET /repos/{owner}/{repo}` | 詳細 |
+
+## 8. Testing Strategy
+| Scope | Tool |
+|-------|------|
+| Unit | Jest / RTL |
+| Component-integration | Jest / RTL |
+| E2E | Playwright |
+
+## 9. CI Pipeline
+1. `actions/setup-node` (`node-version: lts/*`, `cache: npm`)  
+2. `npm ci`  
+3. `npm run lint && npm test`
+
+## 10. Period
+**実装期間** : 2025-06-21 〜 2025-07-03
