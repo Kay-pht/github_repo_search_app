@@ -1,0 +1,37 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Phase 2: GitHub API & データレイヤ – 実装ステップ設計書
+
+## 1. 目的 (Goal)
+TDD（テスト駆動開発）アプローチに基づき、GitHub API (`search/repositories`, `repos/{owner}/{repo}`) との通信を担う、堅牢でテスト済みのデータアクセスレイヤを構築する。
+
+## 2. 成果物 (Deliverables)
+- `src/lib/types.ts`: APIレスポンスの型定義
+- `src/lib/github.ts`: APIクライアント関数
+- `src/lib/github.test.ts`: 上記のユニットテスト (Jest)
+- `.env.local.example`: 環境変数テンプレート
+- `.github/workflows/ci.yml`: `npm test` を実行するCIワークフロー
+
+## 3. 前提条件 (Prerequisites)
+- Phase 1 (プロジェクト基盤構築) が完了していること
+- `npm` が利用可能であること
+- 開発者各自が有効な GitHub Personal Access Token (PAT) を準備していること
+
+## 4. 実装ステップ (Implementation Steps)
+
+| ID      | タスク                       | 担当者 | 状態   | 詳細                                                                                                                                                                                                                                                        |
+| :------ | :--------------------------- | :----- | :----- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **2.1** | **Jest テスト環境構築**      | Agent  | 未着手 | 1. `npm install -D jest @types/jest ts-jest jest-environment-jsdom`<br>2. `jest.config.mjs` を作成し、Next.js + TS 環境向けに設定<br>3. `package.json` の `scripts` に `"test": "jest --passWithNoTests"` を追加<br>4. `npm test` が成功することを確認           |
+| **2.2** | **GitHub PAT 設定**          | Agent/User | 未着手 | 1. (Agent) `.env.local.example` ファイルに `GITHUB_PAT=""` を記述<br>2. (Agent) `.gitignore` に `.env.local` が含まれていることを確認<br>3. (User) `.env.local` を作成し、有効な GitHub PAT を設定する<br>4. (Agent) `README.md` にセットアップ手順を追記                         |
+| **2.3** | **型定義 (`types.ts`)**      | Agent  | 未着手 | 1. `src/lib/types.ts` を作成<br>2. ワイヤーフレームに必要な最小限のフィールドで `Repository` と `RepositoryDetails` 型を定義<br> - **含めない**: `html_url`, `description` などスコープ外のフィールド                                                      |
+| **2.4** | **APIクライアント実装 (TDD)**  | Agent  | 未着手 | 1. `src/lib/github.test.ts` を作成<br>2. `fetch` を `jest.fn()` でモックし、テストケースを先行記述<br>  - 正常系: 期待するデータ構造が返る<br>  - 異常系: APIエラー時にErrorオブジェクトがスローされる<br>3. `src/lib/github.ts` でテストをパスする実装を行う |
+| **2.5** | **CI でのテスト実行**          | Agent  | 未着手 | 1. `.github/workflows/ci.yml` を作成または更新<br>2. `npm ci` の後に `npm test` を実行するステップを追加<br>3. (Optional) PR作成時にCIが実行され、テストがパスすることを確認                                                                         |
+
+## 5. 決定事項サマリ (Decision Summary)
+- **型定義**: ワイヤーフレーム表示に必要な最小限のデータのみを型定義の対象とする。
+- **エラーハンドリング**: GitHub API の通信エラー時は、`fetch` が返すエラーをそのままスローする。
+- **テスト**: Jest の標準機能 (`jest.mock`) を用いて `fetch` API をモックし、追加のライブラリ (`msw` など) は導入しない。
+- **PAT管理**: `GITHUB_PAT` は開発者各自が `.env.local` ファイルで管理し、その手順を `README.md` に明記する。
