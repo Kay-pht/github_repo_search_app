@@ -9,7 +9,7 @@ alwaysApply: true
 > **期間** : 2025-06-21 〜 2025-07-03  
 > **ブランチ戦略** : `main` (保護) + `feat/*` PR — TDD で実装
 
-| Step | タスクブロック | 主な内容 (複数サブタスクを包含) | 成果物 |
+| Phase | タスクブロック | 主な内容 (複数サブタスクを包含) | 成果物 |
 |------|---------------|---------------------------------|--------|
 | **1** | **プロジェクト基盤構築** | - GitHub Repo & `create-next-app@latest` で scaffold<br>- Tailwind / shadcn/ui / ESLint / Prettier / TypeScript 設定<br>- GitHub Actions (Node.js *最新 LTS* + **npm** で lint/test) | 初回 CI パス |
 | **2** | **GitHub API & データレイヤ** | - `.env.local` で PAT 管理<br>- `lib/github.ts` (検索・詳細)<br>- 型定義 & ユニットテスト (TDD) | API ユーティリティ |

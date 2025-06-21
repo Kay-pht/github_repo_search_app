@@ -1,10 +1,10 @@
 ---
-description:
+description: # Phase 1: プロジェクト基盤構築 – 実装ステップ設計書
 globs:
-alwaysApply: true
+alwaysApply: false
 ---
 
-# STEP 1: プロジェクト基盤構築 – 実装ステップ設計書
+# Phase 1: プロジェクト基盤構築 – 実装ステップ設計書
 
 > **目的**
 >
@@ -81,10 +81,10 @@ npx tailwindcss init -p
 **`tailwind.config.ts` 例**
 
 ```typescript
-import type { Config } from "tailwindcss";
+import type { Config } from 'tailwindcss';
 
 export default <Config>{
-  content: ["./src/**/*.{ts,tsx,js,jsx,mdx}"],
+  content: ['./src/**/*.{ts,tsx,js,jsx,mdx}'],
   theme: {
     extend: {},
   },
@@ -158,8 +158,8 @@ jobs:
       - name: Setup Node (LTS) & cache
         uses: actions/setup-node@v4
         with:
-          node-version: "lts/*"
-          cache: "npm"
+          node-version: 'lts/*'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
