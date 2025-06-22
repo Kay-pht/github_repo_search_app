@@ -32,3 +32,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## 2. 環境変数の設定
+
+プロジェクトのルートディレクトリに `.env.local` ファイルを作成し、以下の内容を追記してください。
+GitHub Personal Access Token (PAT) は、[こちら](https://github.com/settings/tokens) から `repo` スコープの権限で発行できます。
+
+```bash
+GH_PAT="your_github_personal_access_token"
+```
+
+## 3. 依存関係のインストール
+
+```bash
+nvm use
+```

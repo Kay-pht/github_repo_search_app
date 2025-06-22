@@ -9,7 +9,7 @@ type SearchResult = {
 export async function searchRepositories(query: string): Promise<SearchResult> {
   const response = await fetch(`${GITHUB_API_BASE_URL}/search/repositories?q=${query}`, {
     headers: {
-      Authorization: `token ${process.env.GITHUB_PAT}`,
+      Authorization: `token ${process.env.GH_PAT}`,
     },
   });
 
@@ -23,7 +23,7 @@ export async function searchRepositories(query: string): Promise<SearchResult> {
 export async function getRepositoryDetails(owner: string, repo: string): Promise<Repository> {
   const response = await fetch(`${GITHUB_API_BASE_URL}/repos/${owner}/${repo}`, {
     headers: {
-      Authorization: `token ${process.env.GITHUB_PAT}`,
+      Authorization: `token ${process.env.GH_PAT}`,
     },
   });
 

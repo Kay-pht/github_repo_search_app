@@ -32,7 +32,7 @@ describe('searchRepositories', () => {
     expect(data).toEqual(mockResponse);
     expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/search/repositories?q=test', {
       headers: {
-        Authorization: `token ${process.env.GITHUB_PAT}`,
+        Authorization: `token ${process.env.GH_PAT}`,
       },
     });
   });
@@ -77,7 +77,7 @@ describe('getRepositoryDetails', () => {
     expect(data).toEqual(mockRepo);
     expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/repos/owner/test-repo', {
       headers: {
-        Authorization: `token ${process.env.GITHUB_PAT}`,
+        Authorization: `token ${process.env.GH_PAT}`,
       },
     });
   });
