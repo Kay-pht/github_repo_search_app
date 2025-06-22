@@ -7,7 +7,8 @@ type SearchResult = {
 };
 
 export async function searchRepositories(query: string): Promise<SearchResult> {
-  const response = await fetch(`${GITHUB_API_BASE_URL}/search/repositories?q=${query}`, {
+  const encodedQuery = encodeURIComponent(query);
+  const response = await fetch(`${GITHUB_API_BASE_URL}/search/repositories?q=${encodedQuery}`, {
     headers: {
       Authorization: `token ${process.env.GH_PAT}`,
     },

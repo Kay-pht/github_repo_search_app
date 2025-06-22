@@ -1,16 +1,18 @@
 import { searchRepositories, getRepositoryDetails } from './github';
 import { Repository } from './types';
 
-global.fetch = jest.fn();
-
-const mockFetch = global.fetch as jest.Mock;
-
 describe('searchRepositories', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+  let mockFetch: jest.SpyInstance;
+
+  beforeEach(() => {
+    mockFetch = jest.spyOn(global, 'fetch');
   });
 
-  it('should return repositories on successful fetch', async () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should correctly encode the query and return repositories', async () => {
     const mockRepo: Repository = {
       id: 1,
       name: 'test-repo',
@@ -28,13 +30,19 @@ describe('searchRepositories', () => {
       json: async () => mockResponse,
     });
 
-    const data = await searchRepositories('test');
+    const query = 'react native';
+    const encodedQuery = encodeURIComponent(query);
+    const data = await searchRepositories(query);
+
     expect(data).toEqual(mockResponse);
-    expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/search/repositories?q=test', {
-      headers: {
-        Authorization: `token ${process.env.GH_PAT}`,
-      },
-    });
+    expect(mockFetch).toHaveBeenCalledWith(
+      `https://api.github.com/search/repositories?q=${encodedQuery}`,
+      {
+        headers: {
+          Authorization: `token ${process.env.GH_PAT}`,
+        },
+      }
+    );
   });
 
   it('should throw an error on failed fetch', async () => {
@@ -51,8 +59,14 @@ describe('searchRepositories', () => {
 });
 
 describe('getRepositoryDetails', () => {
+  let mockFetch: jest.SpyInstance;
+
+  beforeEach(() => {
+    mockFetch = jest.spyOn(global, 'fetch');
+  });
+
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it('should return repository details on successful fetch', async () => {
