@@ -10,7 +10,17 @@ interface ProvidersProps {
 
 export default function Providers({ children }: ProvidersProps) {
   // Ensure a single QueryClient per browser session
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60_000, // 60 seconds
+            refetchOnWindowFocus: false,
+          },
+        },
+      })
+  );
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -20,8 +20,8 @@ export default function RepoDetailCard({ repo }: Props) {
           className="rounded-full border border-slate-700"
         />
         <div>
-          <h1 className="text-xl font-semibold">{repo.full_name}</h1>
-          {repo.language && <p className="text-sm text-slate-300">{repo.language}</p>}
+          <h1 className="text-2xl font-bold text-slate-200">{repo.full_name}</h1>
+          {repo.language && <p className="text-base text-slate-400">{repo.language}</p>}
         </div>
       </div>
 
@@ -38,9 +38,9 @@ export default function RepoDetailCard({ repo }: Props) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col rounded-md bg-slate-800 py-4">
-      <span className="text-sm text-slate-400">{label}</span>
-      <span className="text-lg font-medium">{value}</span>
+    <div className="flex flex-col rounded-md bg-slate-800 py-4 hover:bg-slate-700 transition-colors">
+      <span className="text-sm text-slate-500">{label}</span>
+      <span className="text-xl font-semibold text-slate-200">{value}</span>
     </div>
   );
 }

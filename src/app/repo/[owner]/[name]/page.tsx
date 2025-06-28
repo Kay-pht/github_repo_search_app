@@ -13,16 +13,17 @@ async function fetchRepo(owner: string, name: string): Promise<Repository | null
 }
 
 interface Props {
-  params: { owner: string; name: string };
+  params: Promise<{ owner: string; name: string }>;
 }
 
 export default async function RepoDetailPage({ params }: Props) {
-  const repo = await fetchRepo(params.owner, params.name);
+  const { owner, name } = await params;
+  const repo = await fetchRepo(owner, name);
   if (!repo) notFound();
 
   return (
     <main className="flex flex-col items-center px-4 py-8 gap-6">
-      <Link href="/" className="self-start text-blue-300 hover:underline">
+      <Link href="/" className="self-start text-slate-400 hover:text-slate-200 transition-colors">
         ← 検索に戻る
       </Link>
       <RepoDetailCard repo={repo} />
