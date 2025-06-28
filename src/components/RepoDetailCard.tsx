@@ -9,7 +9,7 @@ export default function RepoDetailCard({ repo }: Props) {
   const format = (n: number) => new Intl.NumberFormat('en-US').format(n);
 
   return (
-    <div className="w-full max-w-2xl rounded-md bg-slate-900 text-white p-6 shadow-md space-y-6">
+    <div className="w-full max-w-2xl rounded-lg border border-slate-800 bg-slate-900 p-6 shadow-lg space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Image
@@ -38,7 +38,7 @@ export default function RepoDetailCard({ repo }: Props) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col bg-slate-800 rounded py-4">
+    <div className="flex flex-col rounded-md bg-slate-800 py-4">
       <span className="text-sm text-slate-400">{label}</span>
       <span className="text-lg font-medium">{value}</span>
     </div>

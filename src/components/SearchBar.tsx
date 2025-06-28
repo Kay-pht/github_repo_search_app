@@ -27,7 +27,7 @@ export default function SearchBar() {
     <div className="flex w-full max-w-xl gap-2">
       <input
         type="text"
-        className="flex-1 rounded border px-4 py-2 focus:outline-none"
+        className="flex-1 rounded-lg border border-slate-800 bg-slate-900 px-4 py-2 text-slate-200 placeholder:text-slate-500 focus:border-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-700"
         placeholder="リポジトリ名を入力してください"
         value={input}
         onChange={(e) => setInput(e.target.value)}
