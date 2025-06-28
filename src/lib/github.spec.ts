@@ -1,110 +1,129 @@
-import { searchRepositories, getRepositoryDetails } from './github';
+import { searchRepositories, getRepositoryDetails, GitHubApiError } from './github';
 import { Repository } from './types';
 
-describe('searchRepositories', () => {
-  let mockFetch: jest.SpyInstance;
+describe('GitHub API', () => {
+  const mockFetch = jest.fn();
 
   beforeEach(() => {
-    mockFetch = jest.spyOn(global, 'fetch');
+    jest.clearAllMocks();
+    // @ts-ignore
+    global.fetch = mockFetch;
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
+  describe('searchRepositories', () => {
+    it('should return search results when successful', async () => {
+      const mockResponse = {
+        items: [
+          {
+            id: 1,
+            name: 'test-repo',
+            full_name: 'user/test-repo',
+            owner: { login: 'user', avatar_url: 'https://example.com/avatar.jpg' },
+            stargazers_count: 100,
+            watchers_count: 50,
+            forks_count: 25,
+            open_issues_count: 10,
+          },
+        ],
+      };
 
-  it('should correctly encode the query and return repositories', async () => {
-    const mockRepo: Repository = {
-      id: 1,
-      name: 'test-repo',
-      full_name: 'owner/test-repo',
-      owner: { login: 'owner', avatar_url: 'url' },
-      stargazers_count: 10,
-      watchers_count: 10,
-      forks_count: 5,
-      open_issues_count: 2,
-    };
-    const mockResponse = { items: [mockRepo] };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      });
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockResponse,
+      const result = await searchRepositories('test', 1);
+
+      expect(result).toEqual(mockResponse);
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://api.github.com/search/repositories?q=test&page=1&per_page=30',
+        {
+          headers: {
+            Authorization: 'Bearer test-github-pat-token',
+          },
+        }
+      );
     });
 
-    const query = 'react native';
-    const encodedQuery = encodeURIComponent(query);
-    const data = await searchRepositories(query, 1);
+    it('should throw GitHubApiError on 403 error', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        statusText: 'Forbidden',
+      });
 
-    expect(data).toEqual(mockResponse);
-    expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.github.com/search/repositories?q=${encodedQuery}&page=1&per_page=30`,
-      {
+      await expect(searchRepositories('test')).rejects.toThrow(
+        new GitHubApiError('認証エラーが発生しました', 403, 'Forbidden')
+      );
+    });
+
+    it('should throw GitHubApiError on 429 error', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        statusText: 'Too Many Requests',
+      });
+
+      await expect(searchRepositories('test')).rejects.toThrow(
+        new GitHubApiError('APIレート制限に達しました', 429, 'Too Many Requests')
+      );
+    });
+
+    it('should throw GitHubApiError with default message on unknown error', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+      });
+
+      await expect(searchRepositories('test')).rejects.toThrow(
+        new GitHubApiError(
+          'エラーが発生しました: 500 Internal Server Error',
+          500,
+          'Internal Server Error'
+        )
+      );
+    });
+  });
+
+  describe('getRepositoryDetails', () => {
+    it('should return repository details when successful', async () => {
+      const mockRepository = {
+        id: 1,
+        name: 'test-repo',
+        full_name: 'user/test-repo',
+        owner: { login: 'user', avatar_url: 'https://example.com/avatar.jpg' },
+        stargazers_count: 100,
+        watchers_count: 50,
+        forks_count: 25,
+        open_issues_count: 10,
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockRepository,
+      });
+
+      const result = await getRepositoryDetails('user', 'test-repo');
+
+      expect(result).toEqual(mockRepository);
+      expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/repos/user/test-repo', {
         headers: {
-          Authorization: `Bearer ${process.env.GH_PAT}`,
+          Authorization: 'Bearer test-github-pat-token',
         },
-      }
-    );
-  });
-
-  it('should throw an error on failed fetch', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 403,
-      statusText: 'Forbidden',
+      });
     });
 
-    await expect(searchRepositories('test')).rejects.toThrow(
-      'Failed to fetch repositories: 403 Forbidden'
-    );
-  });
-});
+    it('should throw GitHubApiError on 404 error', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+      });
 
-describe('getRepositoryDetails', () => {
-  let mockFetch: jest.SpyInstance;
-
-  beforeEach(() => {
-    mockFetch = jest.spyOn(global, 'fetch');
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  it('should return repository details on successful fetch', async () => {
-    const mockRepo: Repository = {
-      id: 1,
-      name: 'test-repo',
-      full_name: 'owner/test-repo',
-      owner: { login: 'owner', avatar_url: 'url' },
-      language: 'TypeScript',
-      stargazers_count: 10,
-      watchers_count: 10,
-      forks_count: 5,
-      open_issues_count: 2,
-    };
-
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockRepo,
+      await expect(getRepositoryDetails('user', 'nonexistent')).rejects.toThrow(
+        new GitHubApiError('リポジトリが見つかりませんでした', 404, 'Not Found')
+      );
     });
-
-    const data = await getRepositoryDetails('owner', 'test-repo');
-    expect(data).toEqual(mockRepo);
-    expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/repos/owner/test-repo', {
-      headers: {
-        Authorization: `Bearer ${process.env.GH_PAT}`,
-      },
-    });
-  });
-
-  it('should throw an error on failed fetch', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 404,
-      statusText: 'Not Found',
-    });
-
-    await expect(getRepositoryDetails('owner', 'non-existent-repo')).rejects.toThrow(
-      'Failed to fetch repository details: 404 Not Found'
-    );
   });
 });

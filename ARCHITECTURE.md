@@ -140,6 +140,14 @@ GET /api/github/search?q={keyword}&page={number}
 }
 ```
 
+**Error Response**:
+
+```json
+{
+  "message": string
+}
+```
+
 ### 7.2 /api/github/repo
 
 **Request**:
@@ -152,6 +160,14 @@ GET /api/github/repo?owner={owner}&name={name}
 
 ```json
 Repository object
+```
+
+**Error Response**:
+
+```json
+{
+  "message": string
+}
 ```
 
 ## 8. Type Definitions
@@ -175,13 +191,14 @@ type Repository = {
 
 ## 9. Error Handling Strategy
 
-| エラー種別         | 処理方法             | ユーザー体験                |
-| ------------------ | -------------------- | --------------------------- |
-| 429 (Rate Limit)   | エラーメッセージ表示 | "APIレート制限に達しました" |
-| 403 (Forbidden)    | エラーメッセージ表示 | "認証エラーが発生しました"  |
-| 404 (Not Found)    | notFound() 呼び出し  | Next.js の 404 ページ       |
-| ネットワークエラー | エラーメッセージ表示 | "通信エラーが発生しました"  |
-| 空検索結果         | Empty State 表示     | "0 件でした"                |
+| エラー種別         | 処理方法             | ユーザー体験                                                                              |
+| ------------------ | -------------------- | ----------------------------------------------------------------------------------------- |
+| 429 (Rate Limit)   | エラーメッセージ表示 | "APIレート制限に達しました"                                                               |
+| 403 (Forbidden)    | エラーメッセージ表示 | "認証エラーが発生しました"                                                                |
+| 404 (Not Found)    | notFound() 呼び出し  | Next.js の 404 ページ                                                                     |
+| ネットワークエラー | エラーメッセージ表示 | "通信エラーが発生しました"                                                                |
+| 空検索結果         | Empty State 表示     | "0 件でした"                                                                              |
+| 環境変数未設定     | 起動時エラー         | "環境変数 GH_PAT が設定されていません。GitHub Personal Access Token を設定してください。" |
 
 ## 10. Testing Strategy
 
@@ -226,8 +243,15 @@ jobs:
 - GitHub PAT は環境変数で管理（.env.local）
 - API Routes 経由で PAT を隠蔽
 - クライアントサイドに認証情報を露出しない
+- 環境変数未設定時は起動時にエラーで停止
 
-## 14. Future Improvements (Out of Scope)
+## 14. Metadata Configuration
+
+- **タイトル**: "GitHub Repository Search"
+- **説明文**: "Search and explore GitHub repositories with infinite scroll"
+- **言語**: "ja" (日本語)
+
+## 15. Future Improvements (Out of Scope)
 
 - 検索フィルター（言語、スター数など）
 - ソート機能
@@ -236,7 +260,7 @@ jobs:
 - PWA対応
 - i18n対応
 
-## 15. Development Timeline
+## 16. Development Timeline
 
 - **Phase 1**: プロジェクト基盤構築（完了）
 - **Phase 2**: GitHub API 実装（完了）

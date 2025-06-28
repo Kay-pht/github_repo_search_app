@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { searchRepositories } from '@/lib/github';
+import { searchRepositories, GitHubApiError } from '@/lib/github';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -16,6 +16,9 @@ export async function GET(request: NextRequest) {
     const nextPage = items.length === 30 ? page + 1 : null;
     return NextResponse.json({ items, nextPage });
   } catch (error: any) {
+    if (error instanceof GitHubApiError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
+    }
     return NextResponse.json({ message: error.message ?? 'Unexpected error' }, { status: 500 });
   }
 }

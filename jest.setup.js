@@ -28,3 +28,6 @@ window.location = {
   replace: jest.fn(),
   assign: jest.fn(),
 };
+
+// テスト用の環境変数設定
+process.env.GH_PAT = 'test-github-pat-token';

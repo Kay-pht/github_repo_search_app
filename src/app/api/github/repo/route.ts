@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRepositoryDetails } from '@/lib/github';
+import { getRepositoryDetails, GitHubApiError } from '@/lib/github';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
     const repo = await getRepositoryDetails(owner, name);
     return NextResponse.json({ repo });
   } catch (error: any) {
+    if (error instanceof GitHubApiError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
+    }
     return NextResponse.json({ message: error.message ?? 'Unexpected error' }, { status: 500 });
   }
 }

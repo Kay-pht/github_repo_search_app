@@ -2,6 +2,32 @@ import { Repository } from './types';
 
 const GITHUB_API_BASE_URL = 'https://api.github.com';
 
+// 環境変数チェック
+if (!process.env.GH_PAT) {
+  throw new Error(
+    '環境変数 GH_PAT が設定されていません。GitHub Personal Access Token を設定してください。'
+  );
+}
+
+// カスタムエラークラス
+export class GitHubApiError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+    public statusText: string
+  ) {
+    super(message);
+    this.name = 'GitHubApiError';
+  }
+}
+
+// エラーメッセージの定義
+const ERROR_MESSAGES: Record<number, string> = {
+  403: '認証エラーが発生しました',
+  404: 'リポジトリが見つかりませんでした',
+  429: 'APIレート制限に達しました',
+};
+
 type SearchResult = {
   items: Repository[];
 };
@@ -22,7 +48,10 @@ export async function searchRepositories(
   );
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch repositories: ${response.status} ${response.statusText}`);
+    const message =
+      ERROR_MESSAGES[response.status] ||
+      `エラーが発生しました: ${response.status} ${response.statusText}`;
+    throw new GitHubApiError(message, response.status, response.statusText);
   }
 
   return response.json();
@@ -36,9 +65,10 @@ export async function getRepositoryDetails(owner: string, repo: string): Promise
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch repository details: ${response.status} ${response.statusText}`
-    );
+    const message =
+      ERROR_MESSAGES[response.status] ||
+      `エラーが発生しました: ${response.status} ${response.statusText}`;
+    throw new GitHubApiError(message, response.status, response.statusText);
   }
 
   return response.json();
