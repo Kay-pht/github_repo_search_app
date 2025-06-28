@@ -36,8 +36,9 @@ describe('RepoDetailCard', () => {
   });
 
   it('should render without language', () => {
-    const repoWithoutLanguage = { ...mockRepository, language: undefined };
-    const { container } = render(<RepoDetailCard repo={repoWithoutLanguage} />);
+    const repoWithoutLanguage = { ...mockRepository };
+    delete repoWithoutLanguage.language;
+    render(<RepoDetailCard repo={repoWithoutLanguage} />);
 
     // Should not crash and still render other information
     expect(screen.getByText('facebook/react')).toBeInTheDocument();
