@@ -1,0 +1,37 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Phase 2: GitHub API & データレイヤ – 実装ステップ設計書
+
+## 1. 目的 (Goal)
+TDD（テスト駆動開発）アプローチに基づき、GitHub API (`search/repositories`, `repos/{owner}/{repo}`) との通信を担う、堅牢でテスト済みのデータアクセスレイヤを構築する。
+
+## 2. 成果物 (Deliverables)
+- `src/lib/types.ts`: APIレスポンスの型定義
+- `src/lib/github.ts`: APIクライアント関数
+- `src/lib/github.test.ts`: 上記のユニットテスト (Jest)
+- `.env.local.example`: 環境変数テンプレート
+- `.github/workflows/ci.yml`: `npm test` を実行するCIワークフロー
+
+## 3. 前提条件 (Prerequisites)
+- Phase 1 (プロジェクト基盤構築) が完了していること
+- `npm` が利用可能であること
+- 開発者各自が有効な GitHub Personal Access Token (PAT) を準備していること
+
+## 4. 実装ステップ (Implementation Steps)
+
+| ID      | タスク                       | 担当者 | 状態   | 詳細                                                                                                                                                                                                                                                        |
+| :------ | :--------------------------- | :----- | :----- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **2.1** | **Jest テスト環境構築**      | Agent  | ✅完了 | 1. `npm install -D jest @types/jest ts-jest jest-environment-jsdom @testing-library/react @testing-library/jest-dom`<br>2. `jest.config.mjs`, `jest.setup.js` を作成し、Next.js + TS 環境向けに設定<br>3. `package.json` に `test` スクリプトを追加           |
+| **2.2** | **GitHub PAT 設定**          | Agent/User | ✅完了 | 1. `.env.local.example` ファイルに `GH_PAT=""` を記述<br>2. `README.md` に `GH_PAT` のセットアップ手順を追記                         |
+| **2.3** | **型定義 (`types.ts`)**      | Agent  | ✅完了 | 1. `src/lib/types.ts` を作成<br>2. ワイヤーフレームで必要なフィールドを網羅した、単一の `Repository` 型を定義（`RepositoryDetails` は実装を簡素化するため統合）                                                      |
+| **2.4** | **APIクライアント実装 (TDD)**  | Agent  | 🚧修正中 | 1. `src/lib/github.test.ts` を作成<br>2. `jest.spyOn` で `fetch` をモックし、テストケースを記述<br>  - **要件**: クエリ文字列は `encodeURIComponent` でエンコードすること<br>  - **要件**: テスト後は `jest.restoreAllMocks` でモックをクリーンアップすること<br>3. `src/lib/github.ts` でテストをパスする実装を行う |
+| **2.5** | **CI でのテスト実行**          | Agent  | ✅完了 | 1. `.github/workflows/ci.yml` を作成<br>2. `npm test` を実行するステップを追加し、`GH_PAT` をシークレットから渡すように設定                                                                         |
+
+## 5. 決定事項サマリ (Decision Summary)
+- **型定義**: `Repository` と `RepositoryDetails` は単一の `Repository` 型に統合し、管理を簡素化する。
+- **エラーハンドリング**: GitHub API の通信エラー時は、`fetch` が返すエラーをそのままスローする。
+- **テスト**: Jest の `jest.spyOn` を用いて `fetch` API をモックし、テスト後は `jest.restoreAllMocks` で確実に復元する。
+- **PAT管理**: シークレット名は `GH_PAT` とし、開発者各自が `.env.local` ファイルで管理する。その手順を `README.md` に明記する。
