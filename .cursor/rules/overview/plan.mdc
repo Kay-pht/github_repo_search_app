@@ -13,7 +13,7 @@ alwaysApply: true
 |------|---------------|---------------------------------|--------|
 | **1** | **プロジェクト基盤構築** | - GitHub Repo & `create-next-app@latest` で scaffold<br>- Tailwind / shadcn/ui / ESLint / Prettier / TypeScript 設定<br>- GitHub Actions (Node.js *最新 LTS* + **npm** で lint/test) | 初回 CI パス |
 | **2** | **GitHub API & データレイヤ** | - `.env.local` で PAT 管理<br>- `lib/github.ts` (検索・詳細)<br>- 型定義 & ユニットテスト (TDD) | API ユーティリティ |
-| **3** | **検索ページ (無限スクロール)** | - `SearchBar` / `RepoCard` / `InfiniteScroll` Hook<br>- エラー / Skeleton / Empty State<br>- URL クエリ保持 | `/` で検索→一覧 |
+| **3** | **検索ページ (無限スクロール)** | - 検索ボタンによるキーワード検索機能の実装<br>- `useInfiniteQuery` と `react-intersection-observer` を活用した無限スクロール<br>- `SearchBar`, `RepoCard`, `RepoList` 等のコンポーネント群の作成<br>- ローディング、エラー、Empty Stateなどの各種UI状態に対応 | `/` で検索→一覧 |
 | **4** | **詳細ページ** | - Server Component で Repo 詳細取得<br>- レイアウト & 戻りナビ | `/repo/[owner]/[name]` |
 | **5** | **テスト & CI 拡充** | - 単体テスト補完<br>- Playwright E2E (検索→詳細)<br>- カバレッジ レポート連携 | テスト緑 & レポート |
 | **6** | **ドキュメント & リファクタ** | - README 整備 (セットアップ手順 / AI 利用方法)<br>- 型厳格化 / 不要コード掃除 | README & コードフリーズ |
@@ -23,5 +23,5 @@ alwaysApply: true
 | リスク | 対策 |
 |--------|------|
 | GitHub API レート制限 | `Retry-After` バックオフ／ローカルキャッシュ |
-| 無限スクロール Hook 不安定 | Storybook 検証 + ユニットテスト |
+| 無限スクロール Hook 不安定 | `useInfiniteQuery` と `react-intersection-observer` の組み合わせをテスト |
 | 〆切直前のバグ混入 | Step 6 でコードフリーズ & 集中レビュー |

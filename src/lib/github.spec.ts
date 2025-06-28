@@ -32,14 +32,14 @@ describe('searchRepositories', () => {
 
     const query = 'react native';
     const encodedQuery = encodeURIComponent(query);
-    const data = await searchRepositories(query);
+    const data = await searchRepositories(query, 1);
 
     expect(data).toEqual(mockResponse);
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.github.com/search/repositories?q=${encodedQuery}`,
+      `https://api.github.com/search/repositories?q=${encodedQuery}&page=1&per_page=30`,
       {
         headers: {
-          Authorization: `token ${process.env.GH_PAT}`,
+          Authorization: `Bearer ${process.env.GH_PAT}`,
         },
       }
     );
@@ -91,7 +91,7 @@ describe('getRepositoryDetails', () => {
     expect(data).toEqual(mockRepo);
     expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/repos/owner/test-repo', {
       headers: {
-        Authorization: `token ${process.env.GH_PAT}`,
+        Authorization: `Bearer ${process.env.GH_PAT}`,
       },
     });
   });

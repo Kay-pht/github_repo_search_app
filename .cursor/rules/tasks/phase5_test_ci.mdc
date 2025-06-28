@@ -1,0 +1,36 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Phase 5: テスト & CI 拡充 – 実装ステップ設計書
+
+## 1. 目的 (Goal)
+最小構成で動作確認済みのアプリに対し、ユニット／コンポーネント／E2E テストを整備し、GitHub Actions 上で自動実行される CI パイプラインを構築する。
+
+## 2. 成果物 (Deliverables)
+- `src/__tests__/` ディレクトリ: RTL テストファイル群
+- `e2e/` ディレクトリ: Playwright シナリオ
+- `playwright.config.ts`: Playwright 設定（Chromium のみ）
+- `.github/workflows/ci.yml`: lint → unit → e2e のジョブ
+- `package.json` スクリプト: `test`, `test:e2e`, `lint`, `ci`
+
+## 3. 前提条件 (Prerequisites)
+- Phase 4 までが完了し、詳細ページが動作する
+- Playwright が開発環境にインストール可能 (`npx playwright install`)
+
+## 4. 実装ステップ (Implementation Steps)
+
+| ID | タスク | 担当者 | 状態 | 詳細 |
+| :-- | :----- | :--- | :--- | :---- |
+| **5.1** | **RTL コンポーネントテスト** | Agent | 🔲未着手 | 1. `SearchBar` : 入力 → 300ms 後に URL クエリ更新を検証<br>2. `RepoList` : `useInfiniteQuery` モックで無限スクロール挙動をテスト<br>3. `RepoDetailCard` : props にダミーデータを渡して表示を確認 |
+| **5.2** | **Playwright E2E シナリオ** | Agent | 🔲未着手 | 1. 検索キーワード入力 → 結果表示を確認<br>2. スクロールして追加ロードを確認<br>3. 1 件クリック→詳細ページ→戻る<br>4. API レスポンスはネットワークレベルでモックせず、実 API を呼ぶ（MCP 実行環境でネットへ接続する前提） |
+| **5.3** | **Playwright 設定** | Agent | 🔲未着手 | 1. `chromium` のみターゲット<br>2. ビューポート 1280×720<br>3. `snapshotPath` を `.playwright-snapshots` に指定 |
+| **5.4** | **CI ワークフロー作成** | Agent | 🔲未着手 | 1. `actions/checkout`, `actions/setup-node@v4` (`node-version: lts/*`, `cache: npm`)<br>2. `npm ci`→`npm run lint --max-warnings 0`→`npm run test`→`npm run test:e2e` を順に実行 |
+| **5.5** | **npm スクリプト整理** | Agent | 🔲未着手 | - `lint`: `next lint`<br>- `test`: `jest --runInBand`<br>- `test:e2e`: `playwright test`<br>- `ci`: `npm run lint && npm run test && npm run test:e2e` |
+
+## 5. 決定事項サマリ (Decision Summary)
+- **カバレッジ閾値**: 設定しないが、`--coverage` でレポートを出力
+- **ブラウザ**: Chromium のみ対象。Firefox/WebKit は CI 時間削減のため無効化。
+- **外部サービス連携**: Codecov 等は使用しない
+- **ネットワークモック**: E2E テストは実 API 叩き → 将来的にフレーク時のみモック導入を検討
