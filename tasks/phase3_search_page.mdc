@@ -1,0 +1,21 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+| - [ ] | **3.1** | **ライブラリ導入**                           | Agent  | 🔲未着手 | 1. `npm install @tanstack/react-query react-intersection-observer` を実行<br>2. `QueryClientProvider` をアプリケーションのルートである `app/layout.tsx` に設定する                                                         |
+| - [ ] | **3.2** | **API Route 実装 (`/api/github/search`)**      | Agent  | 🔲未着手 | 1. `q` (検索語) と `page` (ページ番号) をクエリから取得<br>2. `lib/github.ts` の `searchRepositories` を呼び出し、結果をGitHub APIから取得<br>3. 成功時は `{ items, nextPage }` の形式で、失敗時は `{ "message": "エラーメッセージ" }` 形式のJSONを返す |
+| - [ ] | **3.3** | **デバウンスフック実装 (`use-debounce.ts`)**   | Agent  | 🔲未着手 | 1. `useState` と `useEffect` を利用し、指定された待機時間 (300ms) が経過した後に値を更新するカスタムフックを作成する                                                                                                           |
+| - [ ] | **3.4** | **`SearchBar` コンポーネント実装**             | Agent  | 🔲未着手 | 1. `shadcn/ui` の `Input` を使用<br>2. `use-debounce` フックを使い、入力が300ms停止したらURLのクエリパラメータ (`?q=...`) を `next/navigation` の `useRouter` を使って更新する<br>3. `useSearchParams` でURLクエリを読み取り、`Input` の表示と同期させる                   |
+| - [ ] | **3.6** | **`RepoList` & 無限スクロール実装**          | Agent  | 🔲未着手 | 1. `useSearchParams` でURLから検索クエリ `q` を取得する<br>2. `@tanstack/react-query` の `useInfiniteQuery` を用い、クエリキーに `q` を含めて `/api/github/search` をフェッチ。これにより `q` の変更時に自動で再取得がトリガーされる<br>3. `react-intersection-observer` の `useInView` を使い、リスト末尾の要素が表示されたら `fetchNextPage` を呼び出す<br>4. ローディング中 (Skeleton)、0件 (Empty State)、エラー時 (Toast通知) のUIを実装する |
+| - [ ] | **3.7** | **ページ全体の組み立て (`page.tsx`)**          | Agent  | 🔲未着手 | 1. `SearchBar` と `RepoList` コンポーネントを配置<br>2. `Suspense` を使用してURLクエリに基づいたデータ取得のローディング状態を管理し、フォールバックとして `RepoList` のスケルトンUIを表示する                                                                      |
+
+## 5. 決定事項サマリ (Decision Summary)
+- **UI**: 提供されたワイヤーフレームに基づき、`shadcn/ui` を使用して実装する。
+- **検索トリガー**: `SearchBar` の入力が300ms停止した時点で、自動的に検索を実行する（デバウンス）。
+- **ページネーション**: 無限スクロール時のデータ取得は、1ページあたり30件とする。
+- **状態管理**: 検索キーワードはURLクエリパラメータで管理する。`SearchBar` がURLを更新し、`RepoList` は `useSearchParams` で変更を購読して再フェッチを実行する。
+- **無限スクロール**: `react-intersection-observer` を `RepoList` コンポーネント内に直接実装し、責務を完結させる。カスタムフック `use-infinite-scroll.ts` は作成しない。
+- **エラー通知**: APIエラー（429/403等）は `shadcn/ui` の `Toast` コンポーネントでユーザーに通知する。
+- **`RepoCard` 表示項目**: ワイヤーフレームに基づき、「オーナーアイコン」と「リポジトリ名」のみ表示する。
+

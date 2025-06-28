@@ -1,0 +1,33 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Phase 5: テスト & CI 拡充 – 実装ステップ設計書
+
+## 1. 目的 (Goal)
+最小構成で動作確認済みのアプリに対し、ユニット／コンポーネントテストを整備し、GitHub Actions 上で自動実行される CI パイプラインを構築する。E2Eテストについては、MCPのPlaywrightツールを使用した手動テストとして実施する。
+
+## 2. 成果物 (Deliverables)
+- `src/__tests__/` ディレクトリ: RTL テストファイル群
+- `.github/workflows/ci.yml`: lint → unit のジョブ（更新）
+- `package.json` スクリプト: `test`, `lint`, `ci`
+
+## 3. 前提条件 (Prerequisites)
+- Phase 4 までが完了し、詳細ページが動作する
+- MCPのPlaywrightツールが利用可能（インストール不要）
+
+## 4. 実装ステップ (Implementation Steps)
+
+| ID | タスク | 担当者 | 状態 | 詳細 |
+| :-- | :----- | :--- | :--- | :---- |
+| **5.1** | **RTL コンポーネントテスト** | Agent | 🔲未着手 | 1. `SearchBar` : 入力 → 300ms 後に URL クエリ更新を検証<br>2. `RepoList` : `useInfiniteQuery` モックで無限スクロール挙動をテスト（IntersectionObserverのモックは一般的なベストプラクティスに従う）<br>3. `RepoDetailCard` : props にダミーデータを渡して表示を確認 |
+| **5.2** | **手動E2Eテスト（MCP Playwright）** | Agent | 🔲未着手 | 1. MCPのPlaywrightツールを使用して手動テスト実施<br>2. 検索キーワード入力 → 結果表示を確認<br>3. スクロールして追加ロードを確認<br>4. 1件クリック→詳細ページ→戻る<br>5. スクリーンショットは不要 |
+| **5.3** | **CI ワークフロー更新** | Agent | 🔲未着手 | 1. `actions/checkout`, `actions/setup-node@v4` (`node-version: lts/*`, `cache: npm`)<br>2. `npm ci`→`npm run lint --max-warnings 0`→`npm run test` を順に実行<br>3. E2Eテストステップは除外（手動テストのため） |
+| **5.4** | **npm スクリプト整理** | Agent | 🔲未着手 | - `lint`: `next lint`<br>- `test`: `jest --runInBand`<br>- `ci`: `npm run lint && npm run test` |
+
+## 5. 決定事項サマリ (Decision Summary)
+- **カバレッジ**: レポート出力は不要、カバレッジ割合も考慮しない
+- **E2Eテスト**: MCPのPlaywrightツールを使用した手動テストとして実施
+- **外部サービス連携**: 使用しない
+- **Playwrightインストール**: 不要（MCPツールを使用）

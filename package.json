@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest --passWithNoTests"
+    "test": "jest --runInBand",
+    "ci": "npm run lint && npm run test"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -16,7 +17,9 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "@tanstack/react-query": "^5.29.3",
+    "react-intersection-observer": "^9.16.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -37,6 +40,7 @@
     "tailwindcss": "^4",
     "ts-jest": "^29.4.0",
     "typescript": "^5",
-    "whatwg-fetch": "^3.6.20"
+    "whatwg-fetch": "^3.6.20",
+    "autoprefixer": "^10.4.16"
   }
 }

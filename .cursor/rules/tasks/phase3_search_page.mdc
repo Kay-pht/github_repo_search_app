@@ -1,0 +1,42 @@
+---
+description: # Phase 3: 検索ページ (無限スクロール) – 実装ステップ設計書
+globs: 
+alwaysApply: false
+---
+# Phase 3: 検索ページ (無限スクロール) – 実装ステップ設計書
+
+## 1. 目的 (Goal)
+TDD（テスト駆動開発）アプローチに基づき、GitHub API (`search/repositories`, `repos/{owner}/{repo}`) との通信を担う、堅牢でテスト済みのデータアクセスレイヤを構築する。
+
+## 2. 成果物 (Deliverables)
+- `src/app/page.tsx`: 検索ページのメインファイル
+- `src/app/api/github/search/route.ts`: 検索リクエストを処理するAPI Route
+- `src/components/providers/query-provider.tsx`: TanStack Query の設定とプロバイダー
+- `src/components/search/SearchBar.tsx`: 検索キーワード入力コンポーネント
+- `src/components/search/RepoCard.tsx`: 検索結果のリポジトリ情報を表示するカード
+- `src/components/search/RepoList.tsx`: 検索結果を無限スクロールで一覧表示するコンポーネント
+- `src/hooks/use-infinite-scroll.ts`: Intersection Observerを利用した無限スクロールロジック
+
+## 3. 前提条件 (Prerequisites)
+- Phase 2 (GitHub API & データレイヤ) が完了していること
+- `npm` が利用可能であること
+
+## 4. 実装ステップ (Implementation Steps)
+
+| チェック | ID      | タスク                                       | 担当者 | 状態 | 詳細                                                                                                                                                                                                                                |
+| :--- | :------ | :------------------------------------------- | :----- | :--- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| - [ ] | **3.1** | **ライブラリ導入**                           | Agent  | 🔲未着手 | 1. `npm install @tanstack/react-query react-intersection-observer` を実行<br>2. `QueryClientProvider` を `app/layout.tsx` または `app/page.tsx` のルートに設定する                                                            |
+| - [ ] | **3.2** | **API Route 実装 (`/api/github/search`)**      | Agent  | 🔲未着手 | 1. `q` (検索語) と `page` (ページ番号) をクエリから取得<br>2. `lib/github.ts` の `searchRepositories` を呼び出し、結果をGitHub APIから取得<br>3. 成功時は `{ items, nextPage }` の形式で、失敗時はエラーをそのままクライアントに返す |
+| - [ ] | **3.3** | **`SearchBar` コンポーネント実装**             | Agent  | 🔲未着手 | 1. `form` タグで `Input` と `Button` をラップする<br>2. `Input` に入力された値を `useState` で管理する<br>3. フォーム送信時（ボタンクリック or Enterキー）に `useRouter` を使ってURLクエリパラメータ (`?q=...`) を更新する<br>4. `useSearchParams` でURLクエリを読み取り、`Input` の表示と同期させる |
+| - [ ] | **3.4** | **`RepoCard` コンポーネント実装**              | Agent  | 🔲未着手 | 1. `shadcn/ui` の `Card` をベースに作成<br>2. ワイヤーフレーム通り、オーナーアイコン (`Avatar`) とリポジトリ名を表示<br>3. カード全体を `next/link` でラップし、`repo/[owner]/[name]` へ遷移させる                           |
+| - [ ] | **3.5** | **`RepoList` & 無限スクロール実装**          | Agent  | 🔲未着手 | 1. `@tanstack/react-query` の `useInfiniteQuery` を用いて `/api/github/search` をフェッチ<br>2. `react-intersection-observer` の `useInView` を使い、リスト末尾の要素が表示されたら `fetchNextPage` を呼び出す<br>3. ローディング中 (Skeleton)、0件 (Empty State)、エラー時 (Toast通知) のUIを実装する |
+| - [ ] | **3.6** | **ページ全体の組み立て (`page.tsx`)**          | Agent  | 🔲未着手 | 1. `SearchBar` と `RepoList` コンポーネントを配置<br>2. `Suspense` を使用して `RepoList` のローディング状態を管理し、フォールバックとしてSkeleton UIを表示する                                                                      |
+
+## 5. 決定事項サマリ (Decision Summary)
+- **UI**: 提供されたワイヤーフレームに基づき、`shadcn/ui` を使用して実装する。
+- **検索トリガー**: `SearchBar` の「検索」ボタンクリック、またはEnterキー押下時に検索を実行する。
+- **ページネーション**: 無限スクロール時のデータ取得は、1ページあたり30件とする。
+- **状態管理**: 検索キーワードはURLクエリパラメータで管理し、`useRouter` / `useSearchParams` で同期する。
+- **無限スクロール**: `react-intersection-observer` をカスタムフック (`useInfiniteScroll` の責務は`RepoList`に統合) にカプセル化し、コンポーネントの関心を分離する。
+- **エラー通知**: APIエラー（429/403等）は `shadcn/ui` の `Toast` コンポーネントでユーザーに通知する。
+- **`RepoCard` 表示項目**: ワイヤーフレームに基づき、「オーナーアイコン」と「リポジトリ名」のみ表示する。

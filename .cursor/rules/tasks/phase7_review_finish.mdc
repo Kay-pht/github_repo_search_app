@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Phase 7: レビュー & 完了 – 実装ステップ設計書
+
+## 1. 目的 (Goal)
+フェーズ 1〜6 で実装した機能を最終確認し、バグ修正・コードクリーンアップを経て学習用リポジトリを完成状態にする。
+
+## 2. 成果物 (Deliverables)
+- `feat/*` ブランチの最終マージ PR (main が緑)
+- README 更新 (最終更新日・バージョン表記 optional)
+- GitHub Discussions / Issues のクローズ
+
+## 3. 前提条件 (Prerequisites)
+- CI (Phase 5) がグリーン
+- ドキュメント (Phase 6) が最新版
+
+## 4. 実装ステップ (Implementation Steps)
+
+| ID | タスク | 担当者 | 状態 | 詳細 |
+| :-- | :----- | :--- | :--- | :---- |
+| **7.1** | **コードフリーズ宣言** | Agent | 🔲未着手 | 1. `main` へマージする直前に `CODE_FREEZE` ラベルを付与<br>2. 以降の変更はバグ修正のみ許可 |
+| **7.2** | **最終レビュー & Bugfix** | Agent | 🔲未着手 | 1. ESLint warning 0件を CI で保証<br>2. Playwright シナリオを再実行し回帰確認 |
+| **7.3** | **リポジトリ完成通知** | Agent | 🔲未着手 | 1. README の「開発状況」を "Completed" に更新<br>2. Issue #1 (Project tracking) をクローズ |
+
+## 5. 決定事項サマリ (Decision Summary)
+- **リリースタグ／CHANGELOG**: 今回はスコープ外
+- **デプロイ**: なし（ローカル実行で表示確認が出来れば OK）
