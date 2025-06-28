@@ -1,9 +1,5 @@
 # GitHub Repository Search App
 
-| CI Status                                                                                         |
-| :------------------------------------------------------------------------------------------------ |
-| ![CI](https://github.com/yasudakeisuke/github_repo_search_app/actions/workflows/ci.yml/badge.svg) |
-
 GitHubのリポジトリを検索し、詳細情報を閲覧できるWebアプリケーションです。Next.js（App Router）、TypeScript、Tailwind CSS、TanStack Queryを使用した最小構成の実装です。
 
 ## 概要
